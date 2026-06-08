@@ -1,0 +1,122 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88px;
+  min-height: 88px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-nav);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  z-index: 9;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+}
+
+.menuBtn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  margin-right: 12px;
+  transition: var(--transition-smooth);
+}
+
+:global(.sidebar-collapsed) .menuBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuBtn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.titleArea h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.greeting {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.highlight {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dateBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.accountBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: 72px;
+    padding: 0 20px;
+  }
+
+  .menuBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .titleArea h1 {
+    font-size: 1.25rem;
+  }
+
+  .dateBadge {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .accountBadge {
+    display: none;
+  }
+}

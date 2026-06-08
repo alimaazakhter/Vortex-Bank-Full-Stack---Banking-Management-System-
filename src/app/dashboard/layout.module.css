@@ -1,0 +1,40 @@
+.layoutContainer {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-base);
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.02), transparent 40%),
+              radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.02), transparent 40%);
+}
+
+@media (max-width: 768px) {
+  .layoutContainer {
+    flex-direction: row;
+  }
+  
+  .mainContent {
+    height: 100vh;
+  }
+
+  .scrollArea {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                     Int           @id @default(autoincrement())
+  name                   String
+  email                  String        @unique
+  passwordHash           String
+  pin                    Int           // 4-digit PIN for transactions
+  accountNo              String        @unique
+  balance                Float         @default(0)
+  age                    Int
+  avatarUrl              String?       // Profile picture / avatar preset identifier
+  themePreference        String        @default("DARK") // "DARK" or "LIGHT"
+  notificationPreference String        @default("ALL")  // "ALL" or "NONE"
+  lastLogin              DateTime?     // Tracks last active timestamp
+  joinDate               DateTime      @default(now())
+  createdAt              DateTime      @default(now())
+  
+  transactions  Transaction[]
+  cards         VirtualCard[]
+  savingsPots   SavingsPot[]
+  notifications Notification[]
+  budgets       Budget[]
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  type        String   // "DEPOSIT", "WITHDRAWAL", "TRANSFER_IN", "TRANSFER_OUT", "SAVINGS_CONTRIBUTION", "SAVINGS_WITHDRAWAL"
+  category    String   @default("BILLS") // "FOOD", "SHOPPING", "BILLS", "TRAVEL", "ENTERTAINMENT", "SAVINGS", "SALARY", "CASH", "TRANSFER"
+  status      String   @default("SUCCESS") // "SUCCESS", "PENDING", "FAILED"
+  description String
+  senderNo    String?  // Sender's account number (if transfer)
+  receiverNo  String?  // Receiver's account number (if transfer)
+  notes       String?  // Personal notes on transactions
+  createdAt   DateTime @default(now())
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId      Int?
+  card        VirtualCard? @relation(fields: [cardId], references: [id], onDelete: SetNull)
+}
+
+model VirtualCard {
+  id         Int      @id @default(autoincrement())
+  cardNumber String   @unique
+  expiry     String   // Format: MM/YY
+  cvv        String
+  status     String   @default("ACTIVE") // "ACTIVE", "FROZEN"
+  createdAt  DateTime @default(now())
+  
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nickname      String?
+  spendingLimit Float         @default(100000)
+  transactions  Transaction[]
+}
+
+model SavingsPot {
+  id             Int      @id @default(autoincrement())
+  name           String
+  targetAmount   Float
+  currentBalance Float    @default(0)
+  createdAt      DateTime @default(now())
+  
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String   // "DEPOSIT", "WITHDRAWAL", "TRANSFER", "CARD", "SAVINGS", "PROFILE"
+  title     String
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Budget {
+  id        Int      @id @default(autoincrement())
+  category  String   // SHOPPING, FOOD, TRAVEL, ENTERTAINMENT, BILLS, HEALTHCARE
+  limit     Float
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, category])
+}

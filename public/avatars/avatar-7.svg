@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-vault" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="lock-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#bg-vault)" />
+  <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(16, 185, 129, 0.15)" stroke-width="2" />
+  <!-- Shackle -->
+  <path d="M42,55 L42,42 C42,32 50,24 60,24 C70,24 78,32 78,42 L78,55" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" />
+  <!-- Lock Body -->
+  <rect x="34" y="52" width="52" height="42" rx="8" fill="url(#lock-grad)" />
+  <!-- Keyhole -->
+  <circle cx="60" cy="68" r="4.5" fill="#020617" />
+  <path d="M57.5,68 L62.5,68 L64,84 L56,84 Z" fill="#020617" />
+  <!-- Status dot -->
+  <circle cx="60" cy="42" r="3" fill="#10b981" />
+</svg>

@@ -1,0 +1,276 @@
+.chartCard {
+  background: var(--bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition-smooth);
+}
+
+.chartCard:hover {
+  border-color: var(--border-color-hover);
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chartHeader h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 3px;
+  border-radius: 8px;
+}
+
+:global(html[data-theme="light"]) .tabs {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.tabBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.tabBtn:hover {
+  color: var(--text-primary);
+}
+
+.tabBtn.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+:global(html[data-theme="light"]) .tabBtn.active {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.statsSummary {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.statBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.statValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.chartWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* Custom Tooltip */
+.customTooltip {
+  background: var(--bg-surface-opaque);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  box-shadow: var(--card-shadow);
+}
+
+.tooltipLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.tooltipValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* Sub-metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+}
+
+.metricCard {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+:global(html[data-theme="light"]) .metricCard {
+  background: rgba(15, 23, 42, 0.01);
+}
+
+.metricLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.metricRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metricValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.iconGreen {
+  color: var(--color-primary);
+}
+
+.iconRed {
+  color: var(--color-danger);
+}
+
+.iconPrimary {
+  color: var(--color-primary);
+}
+
+.iconSecondary {
+  color: var(--color-secondary);
+}
+
+.textGreen {
+  color: var(--color-primary) !important;
+}
+
+.textRed {
+  color: var(--color-danger) !important;
+}
+
+/* Skeletons */
+.loadingSkeleton {
+  pointer-events: none;
+}
+
+.skeletonTitle {
+  width: 140px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonTabs {
+  width: 150px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonStatBox {
+  width: 120px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 19px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonChartArea {
+  width: 100%;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+:global(html[data-theme="light"]) .skeletonTitle,
+:global(html[data-theme="light"]) .skeletonTabs,
+:global(html[data-theme="light"]) .skeletonStatBox,
+:global(html[data-theme="light"]) .skeletonChartArea {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Responsiveness */
+@media (max-width: 992px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tabs {
+    width: 100%;
+  }
+  .tabBtn {
+    flex: 1;
+    text-align: center;
+  }
+  .statsSummary {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}

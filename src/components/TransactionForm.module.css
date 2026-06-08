@@ -1,0 +1,237 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.balanceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(16, 185, 129, 0.05)), var(--bg-surface);
+}
+
+.balanceLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.balanceVal {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary) 50%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.accountNoLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.accountNoLabel span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.accountNoLabel strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.formCard {
+  background: var(--bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--card-shadow);
+}
+
+.tabsList {
+  display: flex;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 32px;
+}
+
+:global(html[data-theme="light"]) .tabsList {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.tabBtn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+:global(html[data-theme="light"]) .tabBtn:hover {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.tabBtn.activeTab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+:global(html[data-theme="light"]) .tabBtn.activeTab {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fieldIcon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.inputWrapper :global(.input-field) {
+  padding-left: 44px;
+}
+
+.helpText {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.errorBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  color: #fca5a5;
+  font-size: 0.85rem;
+}
+
+.successScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.successIcon {
+  color: var(--color-primary);
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
+}
+
+.successScreen h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.successScreen p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.successBalanceDetail {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 32px;
+  margin-bottom: 32px;
+}
+
+.successBalanceDetail span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.successBalanceDetail strong {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 20px;
+  }
+
+  .balanceHeader {
+    padding: 16px;
+  }
+
+  .balanceVal {
+    font-size: 1.5rem;
+  }
+
+  .accountNoLabel strong {
+    font-size: 0.9rem;
+  }
+
+  .formCard {
+    padding: 20px 12px;
+  }
+
+  .tabsList {
+    flex-direction: row;
+    margin-bottom: 20px;
+    padding: 3px;
+  }
+
+  .tabBtn {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    gap: 4px;
+    border-radius: 6px;
+  }
+
+  .form {
+    gap: 16px;
+  }
+}

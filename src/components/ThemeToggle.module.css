@@ -1,0 +1,28 @@
+.toggleBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.icon {
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.toggleBtn:hover .icon {
+  color: var(--text-primary);
+}
+
+:global(html[data-theme="light"]) .toggleBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
