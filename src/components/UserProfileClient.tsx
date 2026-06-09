@@ -99,6 +99,16 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
   const [isCameraLoading, setIsCameraLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Crop / Zoom / Drag States
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [offsetX, setOffsetX] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [imgDimensions, setImgDimensions] = useState({ width: 300, height: 300 });
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -108,6 +118,7 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
   const streamRef = useRef<MediaStream | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const editBtnRef = useRef<HTMLButtonElement>(null);
+  const cropImageRef = useRef<HTMLImageElement>(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -147,6 +158,92 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
     fileInputRef.current?.click();
   };
 
+  // Smooth interactive dragging on the window when isDragging is true
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const dx = clientX - dragStart.x;
+      const dy = clientY - dragStart.y;
+      setOffsetX((prev) => prev + dx);
+      setOffsetY((prev) => prev + dy);
+      setDragStart({ x: clientX, y: clientY });
+    };
+
+    const handleGlobalEnd = () => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener('mousemove', handleGlobalMove);
+    window.addEventListener('touchmove', handleGlobalMove, { passive: false });
+    window.addEventListener('mouseup', handleGlobalEnd);
+    window.addEventListener('touchend', handleGlobalEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMove);
+      window.removeEventListener('touchmove', handleGlobalMove);
+      window.removeEventListener('mouseup', handleGlobalEnd);
+      window.removeEventListener('touchend', handleGlobalEnd);
+    };
+  }, [isDragging, dragStart]);
+
+  const handleStartDrag = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDragStart({ x: clientX, y: clientY });
+  };
+
+  const handleDrag = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+  };
+
+  const handleEndDrag = () => {
+    setIsDragging(false);
+  };
+
+  const handleCropImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const minDim = Math.min(img.naturalWidth, img.naturalHeight);
+    const scaleFit = 300 / minDim;
+    setImgDimensions({
+      width: img.naturalWidth * scaleFit,
+      height: img.naturalHeight * scaleFit
+    });
+  };
+
+  const handleConfirmCrop = () => {
+    if (!cropImageSrc) return;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      canvas.width = 200;
+      canvas.height = 200;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 200, 200);
+
+      ctx.translate(100, 100);
+      const outputScale = 200 / 240;
+      ctx.scale(zoom * outputScale, zoom * outputScale);
+      ctx.translate(offsetX, offsetY);
+
+      ctx.drawImage(img, -imgDimensions.width / 2, -imgDimensions.height / 2, imgDimensions.width, imgDimensions.height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      saveAvatarDirectly(dataUrl);
+      setIsCropModalOpen(false);
+      setCropImageSrc(null);
+    };
+    img.src = cropImageSrc;
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -158,25 +255,12 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        canvas.width = 200;
-        canvas.height = 200;
-
-        const size = Math.min(img.width, img.height);
-        const sx = (img.width - size) / 2;
-        const sy = (img.height - size) / 2;
-
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        saveAvatarDirectly(dataUrl);
-      };
-      img.src = event.target?.result as string;
+      const result = event.target?.result as string;
+      setCropImageSrc(result);
+      setZoom(1);
+      setOffsetX(0);
+      setOffsetY(0);
+      setIsCropModalOpen(true);
     };
     reader.readAsDataURL(file);
   };
@@ -195,7 +279,6 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
       });
       streamRef.current = stream;
       
-      // Small delay to make sure modal is rendered and ref is available
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -219,7 +302,6 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
       canvas.width = 200;
       canvas.height = 200;
 
-      // Crop video frame to square center
       const size = Math.min(video.videoWidth, video.videoHeight);
       const sx = (video.videoWidth - size) / 2;
       const sy = (video.videoHeight - size) / 2;
@@ -239,7 +321,11 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
 
   const handleUseCapturedPhoto = () => {
     if (capturedImage) {
-      saveAvatarDirectly(capturedImage);
+      setCropImageSrc(capturedImage);
+      setZoom(1);
+      setOffsetX(0);
+      setOffsetY(0);
+      setIsCropModalOpen(true);
       handleCloseWebcam();
     }
   };
@@ -864,6 +950,103 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
                 </>
               )}
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Crop / Adjust Modal */}
+      {isCropModalOpen && cropImageSrc && mounted && createPortal(
+        <div className={styles.modalOverlay}>
+          <div className={`${styles.cropModalContent} glass-card`}>
+            
+            {/* Header */}
+            <div className={styles.cropModalHeader}>
+              <button 
+                type="button" 
+                onClick={() => { setIsCropModalOpen(false); setCropImageSrc(null); }} 
+                className={styles.cropHeaderBtn}
+                title="Cancel crop"
+              >
+                <X size={20} />
+              </button>
+              <h3 className={styles.cropModalTitle}>Drag the image to adjust</h3>
+              <button 
+                type="button" 
+                onClick={handleTriggerUpload} 
+                className={`${styles.cropHeaderBtn} ${styles.uploadBtn}`}
+                title="Upload another photo"
+              >
+                <FolderOpen size={16} />
+                <span>Upload</span>
+              </button>
+            </div>
+            
+            {/* Body (Viewport with Cutout Circle) */}
+            <div className={styles.cropModalBody}>
+              <div 
+                className={styles.cropViewBox}
+                onMouseDown={handleStartDrag}
+                onTouchStart={handleStartDrag}
+              >
+                {/* Dragging Image */}
+                <img 
+                  ref={cropImageRef}
+                  src={cropImageSrc} 
+                  alt="Crop preview" 
+                  onLoad={handleCropImageLoad}
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) scale(${zoom})`,
+                    cursor: isDragging ? 'grabbing' : 'grab',
+                    width: `${imgDimensions.width}px`,
+                    height: `${imgDimensions.height}px`,
+                    maxWidth: 'none',
+                    maxHeight: 'none',
+                    userSelect: 'none',
+                    pointerEvents: 'auto'
+                  }}
+                  draggable="false"
+                />
+
+                {/* Circular Cutout Overlay Mask */}
+                <div className={styles.cropCutoutMask}></div>
+
+                {/* Zoom Controls Pill Overlay */}
+                <div className={styles.zoomControlsPill}>
+                  <button 
+                    type="button" 
+                    onClick={() => setZoom(prev => Math.min(3, prev + 0.25))}
+                    className={styles.zoomControlBtn}
+                    title="Zoom In"
+                  >
+                    <span>+</span>
+                  </button>
+                  <div className={styles.zoomDivider}></div>
+                  <button 
+                    type="button" 
+                    onClick={() => setZoom(prev => Math.max(1, prev - 0.25))}
+                    className={styles.zoomControlBtn}
+                    title="Zoom Out"
+                  >
+                    <span>-</span>
+                  </button>
+                </div>
+
+                {/* Confirmation Circle Checkmark Button */}
+                <button 
+                  type="button" 
+                  onClick={handleConfirmCrop} 
+                  className={styles.confirmCropBtn}
+                  title="Confirm Crop"
+                >
+                  <Check size={24} />
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>,
         document.body

@@ -109,7 +109,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
       <div className={styles.profileSection}>
         <div className={styles.profileInfo}>
-          <div className={styles.avatar}>
+          <div className={`${styles.avatar} ${user.avatarUrl && !isEmoji(user.avatarUrl) ? styles.avatarHasImage : ''}`}>
             {user.avatarUrl ? (
               isEmoji(user.avatarUrl) ? (
                 <span style={{ fontSize: '1.25rem' }}>{user.avatarUrl}</span>

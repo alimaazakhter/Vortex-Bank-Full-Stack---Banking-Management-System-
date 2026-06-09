@@ -189,6 +189,10 @@
   overflow: hidden;
 }
 
+.avatarHasImage {
+  background: transparent !important;
+}
+
 .avatarImage {
   width: 100%;
   height: 100%;
