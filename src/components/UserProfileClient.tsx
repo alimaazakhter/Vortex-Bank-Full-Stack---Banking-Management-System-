@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { 
   User, 
@@ -96,6 +97,11 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isCameraLoading, setIsCameraLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -797,7 +803,7 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
       </div>
 
       {/* Webcam Modal */}
-      {isWebcamOpen && (
+      {isWebcamOpen && mounted && createPortal(
         <div className={styles.modalOverlay}>
           <div className={`${styles.modalContent} glass-card`}>
             <div className={styles.modalHeader}>
@@ -859,7 +865,8 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
