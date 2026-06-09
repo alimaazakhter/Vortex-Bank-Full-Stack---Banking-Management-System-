@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   User, 
@@ -15,7 +15,13 @@ import {
   ShieldAlert,
   CreditCard,
   PiggyBank,
-  Wallet
+  Wallet,
+  Camera,
+  FolderOpen,
+  Trash2,
+  X,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { showToast } from './Toast';
 import styles from './UserProfileClient.module.css';
@@ -83,6 +89,186 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
   const [notificationPref, setNotificationPref] = useState(user.notificationPreference);
   const [themePref, setThemePref] = useState(user.themePreference);
   const [isUpdatingPrefs, setIsUpdatingPrefs] = useState(false);
+
+  // Custom Avatar / Photo Upload / Webcam States
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isWebcamOpen, setIsWebcamOpen] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isCameraLoading, setIsCameraLoading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const editBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        editBtnRef.current &&
+        !editBtnRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Stop camera tracks helper
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  // Ensure camera tracks are stopped if component unmounts
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  const handleTriggerUpload = () => {
+    setIsDropdownOpen(false);
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please upload an image file', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = 200;
+        canvas.height = 200;
+
+        const size = Math.min(img.width, img.height);
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
+
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        saveAvatarDirectly(dataUrl);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleTriggerTakePhoto = async () => {
+    setIsDropdownOpen(false);
+    setIsWebcamOpen(true);
+    setCapturedImage(null);
+    setCameraError(null);
+    setIsCameraLoading(true);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 400, height: 400, facingMode: 'user' },
+        audio: false
+      });
+      streamRef.current = stream;
+      
+      // Small delay to make sure modal is rendered and ref is available
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Camera connection error:', err);
+      setCameraError('Unable to access webcam. Please check camera permissions.');
+    } finally {
+      setIsCameraLoading(false);
+    }
+  };
+
+  const handleCapture = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const video = videoRef.current;
+      canvas.width = 200;
+      canvas.height = 200;
+
+      // Crop video frame to square center
+      const size = Math.min(video.videoWidth, video.videoHeight);
+      const sx = (video.videoWidth - size) / 2;
+      const sy = (video.videoHeight - size) / 2;
+
+      ctx.drawImage(video, sx, sy, size, size, 0, 0, 200, 200);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setCapturedImage(dataUrl);
+      stopCamera();
+    }
+  };
+
+  const handleCloseWebcam = () => {
+    stopCamera();
+    setIsWebcamOpen(false);
+    setCapturedImage(null);
+  };
+
+  const handleUseCapturedPhoto = () => {
+    if (capturedImage) {
+      saveAvatarDirectly(capturedImage);
+      handleCloseWebcam();
+    }
+  };
+
+  const handleDeletePhoto = () => {
+    setIsDropdownOpen(false);
+    const defaultPreset = '/avatars/avatar-1.svg';
+    saveAvatarDirectly(defaultPreset);
+  };
+
+  const saveAvatarDirectly = async (url: string) => {
+    setSelectedAvatar(url);
+    try {
+      const res = await fetch('/api/user/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_details',
+          name,
+          email,
+          avatarUrl: url
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showToast('Profile photo updated successfully!', 'success');
+        router.refresh();
+      } else {
+        showToast(data.error || 'Failed to save profile photo', 'error');
+      }
+    } catch (err) {
+      showToast('Error saving profile photo', 'error');
+    }
+  };
 
   const handleCopyAccountNo = () => {
     navigator.clipboard.writeText(user.accountNo);
@@ -271,11 +457,51 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
           
           {/* User Details card */}
           <div className={`${styles.profileCard} glass-card`}>
-            <div className={styles.avatarMain}>
-              {isEmoji(selectedAvatar) ? (
-                <span className={styles.avatarEmoji}>{selectedAvatar}</span>
-              ) : (
-                <img src={selectedAvatar} alt="Avatar" className={styles.avatarImg} />
+            
+            {/* Hidden File Input */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+            />
+
+            <div className={styles.avatarMainWrapper}>
+              <div className={styles.avatarMain}>
+                {isEmoji(selectedAvatar) ? (
+                  <span className={styles.avatarEmoji}>{selectedAvatar}</span>
+                ) : (
+                  <img src={selectedAvatar} alt="Avatar" className={styles.avatarImg} />
+                )}
+              </div>
+              
+              <button 
+                type="button"
+                ref={editBtnRef}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={styles.editOverlayBtn}
+                title="Edit profile photo"
+              >
+                <Camera size={14} />
+                <span>Edit</span>
+              </button>
+
+              {isDropdownOpen && (
+                <div className={styles.avatarDropdown} ref={dropdownRef}>
+                  <button type="button" className={styles.dropdownItem} onClick={handleTriggerTakePhoto}>
+                    <Camera size={14} />
+                    <span>Take photo</span>
+                  </button>
+                  <button type="button" className={styles.dropdownItem} onClick={handleTriggerUpload}>
+                    <FolderOpen size={14} />
+                    <span>Upload photo</span>
+                  </button>
+                  <button type="button" className={`${styles.dropdownItem} ${styles.dropdownItemDanger}`} onClick={handleDeletePhoto}>
+                    <Trash2 size={14} />
+                    <span>Delete photo</span>
+                  </button>
+                </div>
               )}
             </div>
             
@@ -569,6 +795,72 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
         </div>
 
       </div>
+
+      {/* Webcam Modal */}
+      {isWebcamOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={`${styles.modalContent} glass-card`}>
+            <div className={styles.modalHeader}>
+              <h3>Take Profile Photo</h3>
+              <button onClick={handleCloseWebcam} className={styles.modalCloseBtn}>
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              {cameraError ? (
+                <div className={styles.cameraErrorBox}>
+                  <AlertTriangle size={36} className={styles.errorIcon} />
+                  <p>{cameraError}</p>
+                </div>
+              ) : capturedImage ? (
+                <div className={styles.previewContainer}>
+                  <img src={capturedImage} alt="Captured" className={styles.capturedImg} />
+                </div>
+              ) : (
+                <div className={styles.webcamView}>
+                  {isCameraLoading && <div className={styles.cameraSpinner}>Starting camera...</div>}
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    className={styles.videoStream}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              {cameraError ? (
+                <button type="button" className="btn btn-secondary" onClick={handleCloseWebcam}>
+                  Close
+                </button>
+              ) : capturedImage ? (
+                <>
+                  <button type="button" className="btn btn-secondary" onClick={handleTriggerTakePhoto}>
+                    <RefreshCw size={14} />
+                    <span>Retake</span>
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={handleUseCapturedPhoto}>
+                    <span>Save Photo</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseWebcam}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={handleCapture} disabled={isCameraLoading}>
+                    <Camera size={14} />
+                    <span>Capture</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
