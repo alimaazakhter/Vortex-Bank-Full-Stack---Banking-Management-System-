@@ -866,7 +866,44 @@
 
 @media (max-width: 768px) {
   .header {
-    padding: 20px 24px;
+    padding: 16px;
+    gap: 8px;
+  }
+  
+  .logo {
+    font-size: 1.15rem;
+    gap: 6px;
+  }
+  
+  .logoIcon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .logoIcon :global(svg) {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .navActions {
+    gap: 6px;
+  }
+  
+  .navActions :global(.btn) {
+    padding: 6px 10px !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    height: 32px;
+    min-height: auto;
+  }
+
+  .navActions > button {
+    padding: 6px !important;
+  }
+
+  .navActions > button :global(svg) {
+    width: 16px !important;
+    height: 16px !important;
   }
   
   .headline {
