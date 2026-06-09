@@ -680,3 +680,15 @@
   background: rgba(0, 0, 0, 0.03);
 }
 
+@media (max-width: 480px), (max-height: 520px) {
+  .modalContent {
+    padding: 16px;
+    gap: 12px;
+  }
+  .webcamView, .previewContainer {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+
