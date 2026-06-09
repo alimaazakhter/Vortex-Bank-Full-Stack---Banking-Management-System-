@@ -956,3 +956,51 @@
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 12px;
+    gap: 4px;
+  }
+  
+  .logo {
+    font-size: 1.05rem;
+    gap: 4px;
+  }
+  
+  .logoIcon {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .logoIcon :global(svg) {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .navActions {
+    gap: 4px;
+  }
+  
+  .navActions :global(.btn) {
+    padding: 5px 8px !important;
+    font-size: 0.72rem !important;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .navActions > button {
+    padding: 4px !important;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navActions > button :global(svg) {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
