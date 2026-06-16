@@ -52,6 +52,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
   const closeSidebar = () => {
     document.getElementById('dashboard-sidebar')?.classList.remove('mobile-sidebar-active');
+    document.getElementById('dashboard-sidebar-overlay')?.classList.remove('active');
   };
 
   const handleNavLinkClick = () => {
