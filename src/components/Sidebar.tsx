@@ -65,10 +65,16 @@ export default function Sidebar({ user }: SidebarProps) {
   };
 
   return (
-    <aside className={`${styles.sidebar} glass-card`} id="dashboard-sidebar">
-      <button onClick={closeSidebar} className={styles.closeBtn} aria-label="Close Menu">
-        <X size={20} />
-      </button>
+    <>
+      <div 
+        className={styles.sidebarOverlay} 
+        id="dashboard-sidebar-overlay"
+        onClick={closeSidebar} 
+      />
+      <aside className={`${styles.sidebar} glass-card`} id="dashboard-sidebar">
+        <button onClick={closeSidebar} className={styles.closeBtn} aria-label="Close Menu">
+          <X size={20} />
+        </button>
 
       <div className={styles.logoContainer}>
         <Link href="/" className={styles.logoLink}>
@@ -136,5 +142,6 @@ export default function Sidebar({ user }: SidebarProps) {
         </button>
       </div>
     </aside>
+  </>
   );
 }

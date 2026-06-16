@@ -51,6 +51,7 @@ export default function Header({ user }: HeaderProps) {
   const toggleSidebar = () => {
     if (window.innerWidth <= 768) {
       document.getElementById('dashboard-sidebar')?.classList.toggle('mobile-sidebar-active');
+      document.getElementById('dashboard-sidebar-overlay')?.classList.toggle('active');
     } else {
       document.getElementById('vortex-dashboard-root')?.classList.toggle('sidebar-collapsed');
     }

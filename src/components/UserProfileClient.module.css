@@ -66,6 +66,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .userName {
@@ -401,6 +402,7 @@
   height: 100%;
   object-fit: cover;
   transition: var(--transition-smooth);
+  border-radius: 50%;
 }
 
 .avatarPresetBtn:hover .presetImg {
@@ -627,12 +629,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .capturedImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .cameraSpinner {

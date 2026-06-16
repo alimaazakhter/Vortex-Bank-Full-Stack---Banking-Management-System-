@@ -654,7 +654,7 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
               <div className={styles.prefLeft}>
                 {themePref === 'DARK' ? <Moon size={16} className={styles.iconPrimary} /> : <Sun size={16} className={styles.iconSecondary} />}
                 <div className={styles.prefDetails}>
-                  <p className={styles.prefLabel}>Theme Theme</p>
+                  <p className={styles.prefLabel}>Theme Preference</p>
                   <p className={styles.prefDesc}>Switch between Dark and Light mode.</p>
                 </div>
               </div>
